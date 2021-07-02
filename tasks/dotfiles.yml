@@ -1,0 +1,9 @@
+- name: check if dotfile repo already exists
+  ansible.builtin.command: lxc exec "{{ container_name }}" ls "{{ dotfile_path }}"
+  register: repo_exists
+  ignore_errors: yes
+
+- name: clone dotfiles
+  ansible.builtin.command: "{{ item }}"
+  with_items: "{{ clone_commands }}" 
+  when: repo_exists is failed

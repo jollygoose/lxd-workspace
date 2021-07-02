@@ -1,0 +1,13 @@
+---
+- name: create your container
+  community.general.lxd_container:
+    name: "{{ container_name }}"
+    state: started
+    source:
+      type: image
+      mode: pull
+      server: https://cloud-images.ubuntu.com/releases
+      protocol: simplestreams
+      alias: "{{ container_image }}"
+    profiles: "{{ profiles }}"
+    wait_for_ipv4_addresses: true

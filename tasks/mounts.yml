@@ -1,0 +1,22 @@
+---
+- name: check if mount already exists
+  ansible.builtin.command: lxc exec "{{ container_name }}" ls "{{ mount1_path_lxc }}"
+  register: mount1_exists
+  ignore_errors: yes
+
+- name: map the user and group ids
+  shell: printf "uid $(id -u) 1000\ngid $(id -g) 1000" | lxc config set "{{ container_name }}" raw.idmap -
+  when: mount1_exists is failed
+
+- name: restart a container
+  community.general.lxd_container:
+    name: "{{ container_name }}"
+    state: restarted
+  when: mount1_exists is failed
+
+- name: mount the directory in the container
+  ansible.builtin.command: "{{ item }}"
+  with_items: 
+  - lxc config device add "{{ container_name }}" "{{ mount1_name }}" disk source="{{ mount1_path_host }}" path="{{ mount1_path_lxc }}"
+  when: mount1_exists is failed
+
