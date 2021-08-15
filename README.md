@@ -17,9 +17,11 @@ A handy configuration method to setup a workspace/development container with LXD
 
 ## Setup
 
-Rename the ```example.config.yml``` and ```example.inventory.ini``` files to ```config.yml``` and ```inventory.ini```. Note which parts you want to include/exclude by setting them to false or true(enable_mounts, use_dotfiles, post_setup, and install_packages). By default, all these options are set to false. Finally add your host the ```ansible.cfg``` file.
+Note which parts you want to include/exclude by setting them to false or true (enable_mounts, use_dotfiles, post_setup, and install_packages), and  add your host(s) to the ```ansible.cfg``` file.
 
-Commands can be run in the post.yml using ```lxc exec``` through ansible's command module. Commands placed in the ```config.yml``` file
+Commands can be run in the post.yml using ```lxc exec``` through ansible's command module. Commands placed in the ```config.yml``` file.
+
+Note: containers are set to ephemeral by default. This can be changed in the config.yml by setting is_ephemeral to ```no```.
 
 ### Run
 
@@ -31,7 +33,6 @@ ansible-playbook main.yml --connection=local
 
 # none local
 ansible-playbook main.yml
-
 ```
 
 ## Note on SSH

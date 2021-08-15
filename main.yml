@@ -1,5 +1,5 @@
 ---
-- hosts: containers_host
+- hosts: container_hosts
 
   pre_tasks:
     - name: load configuration

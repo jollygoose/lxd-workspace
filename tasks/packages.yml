@@ -1,7 +1,10 @@
 ---
 - name: update the repos
-  ansible.builtin.command: lxc exec "{{ container_name }}" apt update
+  ansible.builtin.command: lxc exec "{{ item }}" apt update
+  with_items: "{{ containers }}"
 
 - name: install packages
-  ansible.builtin.command: lxc exec "{{ container_name }}" -- apt install "{{ item }}" -y
-  with_items: "{{ container_packages }}"
+  ansible.builtin.command: lxc exec "{{ item[0] }}" -- apt install "{{ item[1] }}" -y
+  with_nested: 
+    - "{{ containers }}"
+    - "{{ container_packages }}"

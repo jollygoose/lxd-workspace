@@ -1,22 +1,31 @@
 ---
 - name: check if mount already exists
-  ansible.builtin.command: lxc exec "{{ container_name }}" ls "{{ mount1_path_lxc }}"
-  register: mount1_exists
+  ansible.builtin.command: lxc exec "{{ item[0] }}" ls "{{ item[1] }}"
+  register: mount_exists
   ignore_errors: yes
+  with_nested:
+    - "{{ containers }}"
+    - "{{ mount_path_lxc }}"
 
 - name: map the user and group ids
-  shell: printf "uid $(id -u) 1000\ngid $(id -g) 1000" | lxc config set "{{ container_name }}" raw.idmap -
-  when: mount1_exists is failed
+  shell: printf "uid $(id -u) 1000\ngid $(id -g) 1000" | lxc config set "{{ item }}" raw.idmap -
+  when: mount_exists is failed
+  with_items: 
+    - "{{ containers }}"
 
 - name: restart a container
   community.general.lxd_container:
-    name: "{{ container_name }}"
+    name: "{{ item }}"
     state: restarted
-  when: mount1_exists is failed
+  when: mount_exists is failed
+  with_items: 
+    - "{{ containers }}"
 
 - name: mount the directory in the container
-  ansible.builtin.command: "{{ item }}"
-  with_items: 
-  - lxc config device add "{{ container_name }}" "{{ mount1_name }}" disk source="{{ mount1_path_host }}" path="{{ mount1_path_lxc }}"
-  when: mount1_exists is failed
-
+  ansible.builtin.command: lxc config device add "{{ item[0] }}" "{{ item[1] }}" disk source="{{ item[2] }}" path="{{ item[3] }}"
+  with_nested: 
+    - "{{ containers }}"
+    - "{{ mount_name }}"
+    - "{{ mount_path_host }}"
+    - "{{ mount_path_lxc }}"
+  when: mount_exists is failed

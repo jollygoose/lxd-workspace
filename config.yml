@@ -1,36 +1,46 @@
 ---
 # LXD container options
-container_name: 'workspace'
+containers: 
+  - 'dev'
+
 container_image: '20.04'
 profiles: ["default"]
 server: 'https://cloud-images.ubuntu.com/releases'
 protocol: 'simplestreams'
+is_ephemeral: yes
 
-
-# install packages
-install_packages: false
+install_packages: true
 container_packages:
-  - ansible
+  - fish
   - yadm
-
+  - python3-virtualenv
+  - ranger
+  - kitty-terminfo
+  - emacs-nox
+  - ranger
+  - tmux
+  - jq
+  - python3-autopep8
+  - elpa-py-autopep8
 
 # run post setup commands
 post_setup: false
 post_commands:
   # add a cache server, etc.
-  - lxc exec "{{ container_name }}" -- bash -c "ls"
+  - ''
   
-
 # dot files
 use_dotfiles: false
-dotfile_path: '/root/dotfiles'
-dotfile_url: 'url_here'
+dotfile_path: ''
+dotfile_url: ''
 clone_commands:
   - lxc exec "{{ container_name }}" git clone '{{ dotfile_url }}'
 
-
 # directory mounts
 enable_mounts: false
-mount1_name: 'projects'
-mount1_path_host: '/your/projects'
-mount1_path_lxc: '/projects'
+mount_name: 
+  - 'data'
+mount_path_host: 
+  - ''
+mount_path_lxc:
+  - '/data'
