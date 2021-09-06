@@ -1,0 +1,38 @@
+---
+- name: map the user and group ids
+  ansible.builtin.shell: |
+    set -o pipefail
+    printf "uid $(id -u) 1000\ngid $(id -g) 1000" | lxc config set "{{ lxc_name }}" raw.idmap -
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: restart a container
+  community.general.lxd_container:
+    name: "{{ lxc_name }}"
+    state: restarted
+
+- name: wait for ssh after reboot
+  wait_for_connection:
+    delay: 5
+    timeout: 60
+
+- name: check if mount device already exists
+  ansible.builtin.shell: |
+    set -o pipefail
+    lxc config device list {{ lxc_name }} | grep "{{ mnt_name }}"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  register: mnt_check
+
+- name: create mountpoint
+  ansible.builtin.command: lxc exec {{ lxc_name }} -- mkdir -p {{ mnt_lxc }}
+  changed_when: false
+  when: mnt_check.stdout | length == 0
+
+- name: mount the directory in the container
+  ansible.builtin.command: |
+    lxc config device add "{{ lxc_name }}" "{{ mnt_name }}" disk source="{{ mnt_host }}" path="{{ mnt_lxc }}"
+  changed_when: false
+  when: mnt_check.stdout | length == 0

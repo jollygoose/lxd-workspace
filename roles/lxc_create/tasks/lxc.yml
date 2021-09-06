@@ -1,0 +1,42 @@
+---
+- name: create your container
+  community.general.lxd_container:
+    name: "{{ lxc_name }}"
+    state: started
+    source:
+      type: image
+      mode: pull
+      server: https://cloud-images.ubuntu.com/releases
+      protocol: simplestreams
+      alias: "{{ container_image }}"
+    profiles: "{{ profiles }}"
+    wait_for_ipv4_addresses: true
+  register: container_setup
+
+- name: get ip4 address
+  shell: |
+    set -o pipefail
+    lxc list -c4 --format csv "{{ lxc_name }}" | cut -d' ' -f1
+  args:
+    executable: /bin/bash
+  register: ip_addr
+  changed_when: false
+
+- name: add lxc to lxd_containers group
+  add_host:
+    hostname: "{{ ip_addr.stdout }}"
+    ansible_user: root
+    groups: [lxd_containers]
+    ansible_connection: ssh
+
+- name: add public key to authorized_keys
+  command: lxc file push /home/{{ ansible_user_id }}/.ssh/id_rsa.pub {{ lxc_name }}/root/.ssh/authorized_keys
+  changed_when: false
+
+- name: set ssh directory permissions
+  ansible.builtin.shell: |
+    lxc exec "{{ lxc_name }}" -- chown -R root: /root/.ssh/
+    lxc exec "{{ lxc_name }}" -- chmod 640 /root/.ssh/authorized_keys
+  args:
+    executable: /bin/bash
+  changed_when: false

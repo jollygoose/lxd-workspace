@@ -1,38 +1,4 @@
-A handy configuration method to setup a workspace/development container with LXD using Ansible. Includes a method to mount a directory from the host with the correct permissions for reading and writing.
-
-## Outline
-
-```
-├── ansible.cfg
-├── config.yml
-├── inventory.ini
-├── main.yml
-└── tasks
-    ├── dotfiles.yml # pulls your dotfiles to make your container feel more like home
-    ├── lxd.yml      # creates the container
-    ├── mounts.yml   # mount any host directories
-    ├── packages.yml # install any needed packages
-    └── post.yml     # run any needed commands after container creation
-```
-
-## Setup
-
-Rename the ```example.config.yml``` and ```example.inventory.ini``` files to ```config.yml``` and ```inventory.ini```. Note which parts you want to include/exclude by setting them to false or true(enable_mounts, use_dotfiles, post_setup, and install_packages). By default, all these options are set to false. Finally add your host the ```ansible.cfg``` file.
-
-Commands can be run in the post.yml using ```lxc exec``` through ansible's command module. Commands placed in the ```config.yml``` file
-
-### Run
-
-```
-cd /to/the/playbook/directory
-
-# local
-ansible-playbook main.yml --connection=local
-
-# none local
-ansible-playbook main.yml
-
-```
+A handy configuration method to setup a workspace/development container with LXD using Ansible. Includes a method to mount a directory from the host with the correct permissions for reading and writing, and optoin to include dotfiles using yadm.
 
 ## Note on SSH
 

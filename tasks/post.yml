@@ -1,4 +1,0 @@
----
-- name: run post setup
-  ansible.builtin.command: "{{ item }}"
-  with_items: "{{ post_commands }}"

@@ -1,26 +1,11 @@
 ---
-- hosts: containers_host
+- hosts: container_host
+  connection: local
+  roles:
+    - role: lxc_create
 
-  pre_tasks:
-    - name: load configuration
-      ansible.builtin.include_vars: config.yml
-
-  tasks:
-    - name: setup LXC container
-      ansible.builtin.import_tasks: tasks/lxd.yml
-
-    - name: configure container mounts  
-      ansible.builtin.import_tasks: tasks/mounts.yml
-      when: enable_mounts
-
-    - name: download dotfiles
-      ansible.builtin.import_tasks: tasks/dotfiles.yml
-      when: use_dotfiles
-
-    - name: install packages
-      ansible.builtin.import_tasks: tasks/packages.yml
-      when: install_packages
-
-    - name: post setup tasks
-      ansible.builtin.import_tasks: tasks/post.yml
-      when: post_setup
+- hosts: lxd_containers
+  remote_user: root
+  roles:
+    - role: post_creation
+    - role: yadm

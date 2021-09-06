@@ -1,0 +1,13 @@
+---
+# LXD container options
+lxc_name: 'workspace'
+container_image: '20.04'
+profiles: ["default"]
+server: 'https://cloud-images.ubuntu.com/releases'
+protocol: 'simplestreams'
+
+# directory mount
+add_mnt: false
+mnt_name: 'data'
+mnt_host: ''
+mnt_lxc: '/data'
